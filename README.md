@@ -1,4 +1,6 @@
-![https://www.flaticon.com/free-icon/cat 3479853](https://raw.githubusercontent.com/therealnv6/catcord/main/.assets/kitty.png)
+<p align="center">
+  <img width="460" height="300" src="https://raw.githubusercontent.com/therealnv6/catcord/main/.assets/kitty.png">
+</p>
 
 > CatCord is a minimal and lightweight discord client.
 
