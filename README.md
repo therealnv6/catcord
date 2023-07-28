@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="460" height="300" src="https://raw.githubusercontent.com/therealnv6/catcord/main/.assets/kitty.png">
+  <img width="400" height="400" src="https://raw.githubusercontent.com/therealnv6/catcord/main/.assets/kitty.png">
 </p>
 
 > CatCord is a minimal and lightweight discord client.
