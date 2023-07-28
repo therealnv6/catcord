@@ -1,8 +1,10 @@
 import { PageApi } from "@gluon-framework/gluon";
+import { updateDOM } from "./theme.ts";
 
 let titleUpdater: {
   title: string;
-  updateTitle: (original: string) => void; getTitle: () => string
+  updateTitle: (original: string) => void;
+  getTitle: () => string;
 } | undefined;
 
 /**
@@ -13,7 +15,7 @@ let titleUpdater: {
 export async function updateTitleHandler(page: PageApi): Promise<void> {
   if (titleUpdater == undefined) {
     titleUpdater = {
-      title: '',
+      title: "",
       /**
        * Updates the title based on the original title obtained from the page.
        * @param {string} original - The original title obtained from the page.
@@ -45,6 +47,7 @@ export async function updateTitleHandler(page: PageApi): Promise<void> {
  */
 export function updatePage(page: PageApi, newTitle: string): void {
   page.title(newTitle);
+  updateDOM(page);
 }
 
 /**
