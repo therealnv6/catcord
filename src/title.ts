@@ -47,7 +47,6 @@ export async function updateTitleHandler(page: PageApi): Promise<void> {
  */
 export function updatePage(page: PageApi, newTitle: string): void {
   page.title(newTitle);
-  updateDOM(page);
 }
 
 /**

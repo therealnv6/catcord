@@ -1,4 +1,5 @@
 import { PageApi, Window } from "@gluon-framework/gluon";
+import { log } from "./util.ts";
 
 /**
  * Interface representing the CSS rules for elements.
@@ -14,6 +15,8 @@ type ElementRules = {
  * @param window - The Window object representing the browser window.
  */
 export async function setupThemeConfig(window: Window) {
+  log("Setting up theme");
+
   // Fetch the style from the specified URL.
   const response = await fetch(
     "https://refact0r.github.io/midnight-discord/midnight.css",
@@ -21,6 +24,8 @@ export async function setupThemeConfig(window: Window) {
 
   // Convert the response to text, which is the CSS style content.
   const style = await response.text();
+
+  log("Retrieved theme");
 
   // Initialize an empty object to hold the CSS rules for elements.
   // These rules will be applied later to the DOM elements.
@@ -37,6 +42,8 @@ export async function setupThemeConfig(window: Window) {
     style: style,
     rules: rules,
   };
+
+  log("Wrote theme to IPC");
 }
 
 /**
