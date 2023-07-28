@@ -1,5 +1,6 @@
-import { open, OpenOptions, PageApi } from '@gluon-framework/gluon';
-import { updateTitleHandler } from './title.ts';
+import { open, OpenOptions, PageApi } from "@gluon-framework/gluon";
+import { updateTitleHandler } from "./title.ts";
+import { setupThemeConfig } from "./theme.ts";
 
 /**
  * Initializes the app by setting up the title update logic.
@@ -7,12 +8,12 @@ import { updateTitleHandler } from './title.ts';
  */
 function initializeApp(page: PageApi): void {
   console.log(
-    '[catcord] 🐱 welcome to catcord :3'
+    "[catcord] 🐱 welcome to catcord :3",
   );
 
   // hopefully I can find a better solution to this, as this takes some resources.
   // probably will make this a opt-out (not opt-in) feature in case you're running low-end hardware.
-  setInterval(() => updateTitleHandler(page), 50);
+  setInterval(() => updateTitleHandler(page), 200);
 }
 
 /**
@@ -21,8 +22,9 @@ function initializeApp(page: PageApi): void {
  */
 async function openWindow(url: string): Promise<void> {
   const window = await open(url, {} as OpenOptions);
+  setupThemeConfig(window);
 
   initializeApp(window.page);
 }
 
-openWindow('https://discord.com/app');
+openWindow("https://discord.com/app");
