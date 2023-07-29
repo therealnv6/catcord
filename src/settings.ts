@@ -98,6 +98,29 @@ export function injectSettings(page: PageApi) {
 
         newNode.textContent = text;
         newNode.id = id;
+        newNode.onclick = () => {
+          const className = "contentColumn-1C7as6";
+
+          // find the class of the "inner" settings element
+          const element = document.querySelector<HTMLDivElement>(
+            `.${className}`,
+          );
+
+          // we will return early if the element was not found; this would be strange,
+          // because how would you be able to see the button? anyways.
+          if (element == null) {
+            return;
+          }
+
+          // clear the inner HTML data of every child.
+          // maybe it's possible to remove every child except for one
+          // context: discord crashes if you clear all of the children (e.g. element.replaceChildren())
+          for (const child of element.children) {
+            child.innerHTML = "";
+          }
+
+          // TODO: write new content for the settings div
+        };
 
         parent.insertAdjacentElement(
           "afterend",
