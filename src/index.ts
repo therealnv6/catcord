@@ -2,6 +2,7 @@ import { open, OpenOptions, PageApi, Window } from "@gluon-framework/gluon";
 import { updateTitleHandler } from "./title.ts";
 import { setupThemeConfig, updateDOM } from "./theme.ts";
 import { log, LogLevel } from "./util.ts";
+import { hookSettingsToIPC, injectSettings } from "./settings.ts";
 
 /**
  * Initializes the app by setting up the title update logic.
@@ -12,6 +13,12 @@ function initializeApp(window: Window, page: PageApi): void {
   log("Welcome to catcord. Meow! 😺");
 
   setupThemeConfig(window);
+
+  // setup the hook to IPC for settings
+  hookSettingsToIPC(window);
+
+  // inject the setting changes, this is a periodic event.
+  injectSettings(page);
 
   // Update the title periodically
   setInterval(() => updateTitleHandler(page), 200);

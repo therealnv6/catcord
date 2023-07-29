@@ -39,6 +39,7 @@ export async function setupThemeConfig(window: Window) {
 
   // Set the fetched style and rules in the Gluon store.
   window.ipc.store.config = {
+    ...window.ipc.store.config,
     style: style,
     rules: rules,
   };
