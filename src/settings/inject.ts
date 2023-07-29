@@ -1,35 +1,5 @@
-import { PageApi, Window } from "@gluon-framework/gluon";
-import { log } from "./util.ts";
-
-// Define the type for a single settings node element
-type SettingsNodeElement = {
-  text: string;
-  id: string;
-};
-
-// The initial settings data with a single element
-let settings: SettingsNodeElement[] = [
-  { text: "CatCord Setting", id: "cat-settings" },
-];
-
-/**
- * Hooks the settings into the IPC (Inter-Process Communication).
- * @param window - The browser window object.
- */
-export function hookSettingsToIPC(window: Window) {
-  // Log that we are hooking the settings into the IPC
-  log("Hooking settings into the IPC");
-
-  // Add the settings and version information to the IPC store config
-  window.ipc.store.config = {
-    ...window.ipc.store.config,
-    settings: settings,
-    version: "1.0.0",
-  };
-
-  // Log that the hooking process is done
-  log("Done!");
-}
+import { PageApi } from "@gluon-framework/gluon";
+import { SettingsNodeElement } from "./shared.ts";
 
 /**
  * Updates the settings menu periodically.
@@ -85,7 +55,7 @@ export function injectSettings(page: PageApi) {
 
       // Create and insert CatCord settings elements
       settingNodes.forEach((node) => {
-        const { text, id } = node;
+        const { text, id, html } = node;
 
         if (parent == null) {
           return;
@@ -112,14 +82,13 @@ export function injectSettings(page: PageApi) {
             return;
           }
 
-          // clear the inner HTML data of every child.
-          // maybe it's possible to remove every child except for one
-          // context: discord crashes if you clear all of the children (e.g. element.replaceChildren())
-          for (const child of element.children) {
-            child.innerHTML = "";
-          }
+          element.setAttribute("id", id);
 
-          // TODO: write new content for the settings div
+          const child = element.children[0];
+          element.replaceChildren();
+          element.appendChild(child);
+
+          child.innerHTML = html;
         };
 
         parent.insertAdjacentElement(

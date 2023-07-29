@@ -7,6 +7,7 @@
       "esnext",
       "dom.iterable"
     ],
+    "jsx": "react-jsx",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "module": "NodeNext",

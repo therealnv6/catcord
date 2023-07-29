@@ -2,7 +2,8 @@ import { open, OpenOptions, PageApi, Window } from "@gluon-framework/gluon";
 import { updateTitleHandler } from "./title.ts";
 import { setupThemeConfig, updateDOM } from "./theme.ts";
 import { log, LogLevel } from "./util.ts";
-import { hookSettingsToIPC, injectSettings } from "./settings.ts";
+import { hookSettingsToIPC } from "./settings/shared.ts";
+import { injectSettings } from "./settings/inject.ts";
 
 /**
  * Initializes the app by setting up the title update logic.
