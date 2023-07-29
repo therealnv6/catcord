@@ -1,6 +1,6 @@
 {
   "name": "discord",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "type": "module",
   "description": "a discord client utilizing gluon",
   "main": "src/index.ts",

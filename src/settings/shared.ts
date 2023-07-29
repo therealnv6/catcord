@@ -28,7 +28,7 @@ export function hookSettingsToIPC(window: Window) {
   window.ipc.store.config = {
     ...window.ipc.store.config,
     settings: settings,
-    version: "1.0.0",
+    version: process.env.npm_package_version,
   };
 
   // Log that the hooking process is done
