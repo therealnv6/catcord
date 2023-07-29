@@ -2,10 +2,7 @@
   <img width="400" height="400" src="https://raw.githubusercontent.com/therealnv6/catcord/main/.assets/kitty.png">
 </p>
 
-## CatCord
-
-CatCord is a minimal and lightweight Discord client designed to support
-platforms that are not natively supported by the official Discord client.
+> CatCord is a minimal and lightweight Discord client.
 
 ### Why CatCord?
 
