@@ -1,5 +1,5 @@
 import { PageApi, Window } from "@gluon-framework/gluon";
-import { log } from "./util.ts";
+import { log, LogLevel, settings } from "./util.ts";
 
 /**
  * Interface representing the CSS rules for elements.
@@ -17,15 +17,30 @@ type ElementRules = {
 export async function setupThemeConfig(window: Window) {
   log("Setting up theme");
 
-  // Fetch the style from the specified URL.
-  const response = await fetch(
-    "https://refact0r.github.io/midnight-discord/midnight.css",
-  );
+  try {
+    // Fetch the style from the specified URL.
+    const response = await fetch(settings.themes);
 
-  // Convert the response to text, which is the CSS style content.
-  const style = await response.text();
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch theme: ${response.status} - ${response.statusText}`,
+      );
+    }
 
-  log("Retrieved theme");
+    // Convert the response to text, which is the CSS style content.
+    const style = await response.text();
+
+    log("Retrieved theme");
+
+    // Update the Gluon store with the fetched style.
+    window.ipc.store.config = {
+      ...window.ipc.store.config,
+      style: style,
+    };
+  } catch (error: any) {
+    // Handle errors that occurred during the fetch process.
+    log(`Error fetching theme: ${error.message}`, LogLevel.ERROR);
+  }
 
   // Initialize an empty object to hold the CSS rules for elements.
   // These rules will be applied later to the DOM elements.
@@ -40,7 +55,6 @@ export async function setupThemeConfig(window: Window) {
   // Set the fetched style and rules in the Gluon store.
   window.ipc.store.config = {
     ...window.ipc.store.config,
-    style: style,
     rules: rules,
   };
 

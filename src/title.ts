@@ -1,5 +1,4 @@
 import { PageApi } from "@gluon-framework/gluon";
-import { updateDOM } from "./theme.ts";
 
 let titleUpdater: {
   title: string;

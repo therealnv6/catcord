@@ -1,8 +1,14 @@
 import { Window } from "@gluon-framework/gluon";
-import { log } from "../util.ts";
+import { editJsonField, log, readJsonFile } from "../util.ts";
 import { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
-import GlobalSettingsTab from "./GlobalSettingsTab.tsx";
+import { GlobalSettingsTab } from "./GlobalSettingsTab.tsx";
+
+type SettingsForm = {
+  themes: string;
+};
+
+export const settings = readJsonFile<SettingsForm>("settings.json");
 
 // Define the type for a single settings node element
 export type SettingsNodeElement = {
@@ -12,9 +18,7 @@ export type SettingsNodeElement = {
 };
 
 // The initial settings data with a single element
-let settings: SettingsNodeElement[] = [
-  GlobalSettingsTab,
-];
+let settingNodes: SettingsNodeElement[];
 
 /**
  * Hooks the settings into the IPC (Inter-Process Communication).
@@ -24,10 +28,35 @@ export function hookSettingsToIPC(window: Window) {
   // Log that we are hooking the settings into the IPC
   log("Hooking settings into the IPC");
 
-  // Add the settings and version information to the IPC store config
+  // Expose form submission for specific IDs
+  for (
+    const id of [
+      "setThemeContents",
+    ]
+  ) {
+    exposeFormSubmit(window, id);
+  }
+
+  // write the settings here already,
+  // considering several of the setting nodes need this.
   window.ipc.store.config = {
     ...window.ipc.store.config,
     settings: settings,
+  };
+
+  // set the setting nodes
+  settingNodes = [
+    wrapToSettingNode(
+      GlobalSettingsTab(window),
+      "cat-settings",
+      "Catcord Settings",
+    ),
+  ];
+
+  // Add the settings and version information to the IPC store config
+  window.ipc.store.config = {
+    ...window.ipc.store.config,
+    settingNodes: settingNodes,
     version: process.env.npm_package_version,
   };
 
@@ -43,13 +72,26 @@ export function hookSettingsToIPC(window: Window) {
  * @returns The setting node object.
  */
 export function wrapToSettingNode(
-  element: () => ReactElement,
+  element: ReactElement,
   id: string,
   display: string,
 ): SettingsNodeElement {
   return {
     text: display,
     id: id,
-    html: renderToString(element()),
+    html: renderToString(
+      element,
+    ),
   };
+}
+
+/**
+ * Exposes form submission for a given ID through IPC.
+ * @param window The browser window object.
+ * @param id The ID of the form submission to expose.
+ */
+export function exposeFormSubmit(window: Window, id: string) {
+  window.ipc.expose(id, (data: string) => {
+    editJsonField("settings.json", JSON.parse(data));
+  });
 }

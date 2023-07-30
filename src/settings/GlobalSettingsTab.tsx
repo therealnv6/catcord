@@ -1,15 +1,19 @@
-import { wrapToSettingNode } from "./shared.ts";
+import { Window } from "@gluon-framework/gluon";
 
-function GlobalSettingsTab() {
+export function GlobalSettingsTab(window: Window) {
   return (
     <div>
+      <form id="setThemeContents">
+        <input
+          type="text"
+          name="themes"
+          value={window.ipc.store.config.settings.themes}
+        />
+        <button>
+          Update Theme
+        </button>
+      </form>
       <p>test</p>
     </div>
   );
 }
-
-export default wrapToSettingNode(
-  GlobalSettingsTab,
-  "cat-settings",
-  "Catcord Settings",
-);
