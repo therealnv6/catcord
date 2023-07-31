@@ -1,6 +1,6 @@
 import { Window } from "@gluon-framework/gluon";
-import TextArea from "../components/textArea.tsx";
-import Button from "../components/button.tsx";
+import TextArea from "../../components/textArea.tsx";
+import Button from "../../components/button.tsx";
 
 export function GlobalSettingsTab(window: Window) {
   return (

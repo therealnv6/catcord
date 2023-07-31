@@ -2,8 +2,8 @@ import { Window } from "@gluon-framework/gluon";
 import { editJsonField, log, readJsonFile } from "../util.ts";
 import { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
-import { GlobalSettingsTab } from "./GlobalSettingsTab.tsx";
 import { setupThemeConfig } from "../theme.ts";
+import { GlobalSettingsTab } from "./components/generalSettingsTab.tsx";
 
 type SettingsForm = {
   themes: string;
