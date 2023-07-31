@@ -1,1 +1,1 @@
-const SETTINGS_CONTENT_CLASS: string = "ontentColumn-1C7as6";
+export const SETTINGS_CONTENT_CLASS: string = "contentColumn-1C7as6";

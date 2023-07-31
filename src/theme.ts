@@ -110,7 +110,10 @@ export async function setupThemeConfig(
     log("Retrieved theme");
     await applyTheme(window, style);
   } catch (error: any) {
-    log(`Error fetching theme: ${error.message}`, LogLevel.ERROR);
+    log(
+      `Error fetching theme: ${error.message}`,
+      LogLevel.ERROR,
+    );
   }
 
   log("Wrote theme to IPC");

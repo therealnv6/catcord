@@ -95,6 +95,7 @@ export function exposeFormSubmit<T>(
   callback?: (data: T) => void | undefined,
 ) {
   window.ipc.expose(id, (data: string) => {
+    console.log(data);
     editJsonField("settings.json", JSON.parse(data));
 
     if (callback != undefined) {

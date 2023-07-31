@@ -1,19 +1,22 @@
 import { Window } from "@gluon-framework/gluon";
+import TextArea from "../components/textArea.tsx";
+import Button from "../components/button.tsx";
 
 export function GlobalSettingsTab(window: Window) {
   return (
-    <div>
-      <form id="setThemeContents">
-        <input
-          type="text"
+    <form id="setThemeContents">
+      <div>
+        <TextArea
           name="themes"
+          rows={5}
+          cols={45}
           value={window.ipc.store.config.settings.themes}
         />
-        <button>
-          Update Theme
-        </button>
-      </form>
-      <p>test</p>
-    </div>
+      </div>
+
+      <Button>
+        Update Theme
+      </Button>
+    </form>
   );
 }
