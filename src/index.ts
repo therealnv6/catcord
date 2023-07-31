@@ -39,6 +39,7 @@ async function openWindow(url: string): Promise<void> {
   const window = await open(url, {
     allowHTTP: "mixed",
     allowNavigation: true,
+    localCSP: "font-src 'self' *;",
   } as OpenOptions);
 
   // Initialize the app after the window is opened
