@@ -1,6 +1,6 @@
 import { open, OpenOptions, PageApi, Window } from "@gluon-framework/gluon";
 import { updateTitleHandler } from "./title.ts";
-import { setupThemeConfig, updateDOM } from "./theme.ts";
+import { setupThemeConfig } from "./theme.ts";
 import { log, LogLevel } from "./util.ts";
 import { hookSettingsToIPC } from "./settings/shared.ts";
 import { injectSettings } from "./settings/inject.ts";
@@ -36,11 +36,14 @@ async function openWindow(url: string): Promise<void> {
     "[catcord] 🚀",
   );
 
-  const window = await open(url, {
-    allowHTTP: "mixed",
-    allowNavigation: true,
-    localCSP: "font-src 'self' *;",
-  } as OpenOptions);
+  const window = await open(
+    url,
+    {
+      allowHTTP: "mixed",
+      allowNavigation: true,
+      localCSP: "font-src 'self' *;",
+    } as OpenOptions,
+  );
 
   // Initialize the app after the window is opened
   initializeApp(window, window.page);
