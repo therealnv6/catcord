@@ -1,4 +1,4 @@
-import { Window } from "@gluon-framework/gluon";
+import { CSSResource, Window } from "@gluon-framework/gluon";
 import { log, LogLevel, settings } from "./util.ts";
 import postcss, { ProcessOptions } from "postcss/lib/postcss";
 
@@ -6,8 +6,8 @@ import postcss, { ProcessOptions } from "postcss/lib/postcss";
  * Fetches the theme configuration from an external URL.
  * @returns {Promise<string>} The CSS style content.
  */
-async function fetchTheme(): Promise<string> {
-  return processCSS(settings.themes);
+async function fetchTheme(url: string): Promise<string> {
+  return processCSS(url);
 }
 
 /**
@@ -66,31 +66,49 @@ async function processCSS(url: string): Promise<string> {
   return parsedCss;
 }
 
+let css: CSSResource | undefined;
+
 /**
  * Applies the fetched theme to the DOM.
  * @param {Window} window - The Window object representing the browser window.
  * @param {string} style - The CSS style content.
  */
-function applyTheme(window: Window, style: string) {
-  window.ipc.store.config = {
-    ...window.ipc.store.config,
-    style: style,
-  };
+async function applyTheme(window: Window, style: string) {
+  try {
+    const updated = await window.resources.css(style);
 
-  window.resources.css(window.ipc.store.config.style);
+    if (css !== undefined) {
+      await css.remove();
+    }
+
+    css = updated;
+  } finally {
+    log("Applied theme!");
+  }
 }
 
 /**
  * Sets up the theme configuration.
  * @param {Window} window - The Window object representing the browser window.
  */
-export async function setupThemeConfig(window: Window) {
+export async function setupThemeConfig(
+  window: Window,
+  url?: string,
+) {
+  if (!url && settings.themes != undefined) {
+    url = settings.themes;
+  }
+
+  if (!url) {
+    return;
+  }
+
   log("Setting up theme");
 
   try {
-    const style = await fetchTheme();
+    const style = await fetchTheme(url);
     log("Retrieved theme");
-    applyTheme(window, style);
+    await applyTheme(window, style);
   } catch (error: any) {
     log(`Error fetching theme: ${error.message}`, LogLevel.ERROR);
   }

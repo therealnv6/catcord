@@ -3,6 +3,7 @@ import { editJsonField, log, readJsonFile } from "../util.ts";
 import { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
 import { GlobalSettingsTab } from "./GlobalSettingsTab.tsx";
+import { setupThemeConfig } from "../theme.ts";
 
 type SettingsForm = {
   themes: string;
@@ -29,12 +30,10 @@ export function hookSettingsToIPC(window: Window) {
   log("Hooking settings into the IPC");
 
   // Expose form submission for specific IDs
-  for (
-    const id of [
-      "setThemeContents",
-    ]
-  ) {
-    exposeFormSubmit(window, id);
+  {
+    exposeFormSubmit<any>(window, "setThemeContents", (data) => {
+      setupThemeConfig(window, data.themes);
+    });
   }
 
   // write the settings here already,
@@ -90,8 +89,16 @@ export function wrapToSettingNode(
  * @param window The browser window object.
  * @param id The ID of the form submission to expose.
  */
-export function exposeFormSubmit(window: Window, id: string) {
+export function exposeFormSubmit<T>(
+  window: Window,
+  id: string,
+  callback?: (data: T) => void | undefined,
+) {
   window.ipc.expose(id, (data: string) => {
     editJsonField("settings.json", JSON.parse(data));
+
+    if (callback != undefined) {
+      callback(JSON.parse(data) as T);
+    }
   });
 }
