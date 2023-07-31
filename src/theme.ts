@@ -58,6 +58,10 @@ export async function setupThemeConfig(window: Window) {
     rules: rules,
   };
 
+  window.resources.css(
+    window.ipc.store.config.style,
+  );
+
   log("Wrote theme to IPC");
 }
 
@@ -66,11 +70,10 @@ export async function setupThemeConfig(window: Window) {
  * @param page - The PageApi object used for DOM manipulation.
  */
 export function updateDOM(page: PageApi) {
-  // Evaluate and execute the functions 'appendToDOM' and 'applyIndividualRules'
+  // Evaluate and execute the function 'applyIndividualRules'
   // in the context of the provided PageApi object (page).
-  // 'appendToDOM' adds the fetched style to the document's head,
   // and 'applyIndividualRules' applies the CSS rules to DOM elements.
-  page.eval(appendToDOM);
+
   page.eval(applyIndividualRules);
 }
 
@@ -109,9 +112,9 @@ function applyIndividualRules() {
 }
 
 /**
- * Asynchronously appends the fetched style to the DOM's head element.
+ * Appends the fetched style to the DOM's head element.
  */
-async function appendToDOM() {
+function appendToDOM() {
   // 'Gluon' doesn't exist on window in normal types, so we have to cast window to 'any'.
   // Retrieve the configuration containing style from the Gluon store.
   const { config } = (window as any).Gluon.ipc.store;
@@ -127,4 +130,26 @@ async function appendToDOM() {
 
   // Append the <style> element to the document's head.
   document.head.appendChild(element);
+
+  (window as any).chrome.webRequest.onHeadersReceived(
+    (
+      { responseHeaders, resourceType }: {
+        responseHeaders: any;
+        resourceType: any;
+      },
+      done: any,
+    ) => {
+      if (!responseHeaders) return done({});
+
+      if (resourceType === "mainFrame") {
+        delete responseHeaders["content-security-policy"];
+      } else if (resourceType === "stylesheet") {
+        // Fix hosts that don't properly set the css content type, such as
+        // raw.githubusercontent.com
+        responseHeaders["content-type"] = ["text/css"];
+      }
+
+      return done({ responseHeaders });
+    },
+  );
 }

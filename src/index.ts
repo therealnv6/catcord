@@ -21,12 +21,8 @@ function initializeApp(window: Window, page: PageApi): void {
   // inject the setting changes, this is a periodic event.
   injectSettings(page);
 
-  // Update the title periodically
-  setInterval(() => updateTitleHandler(page), 200);
-
-  // Update the theme after 500 milliseconds - is this fine? I doubt it has to be updated periodically,
-  // unless Discord will be in the pain in the ass and override the theme.
-  setTimeout(() => updateDOM(page), 500);
+  // Update the title
+  updateTitleHandler(window, page);
 }
 
 /**
@@ -40,7 +36,10 @@ async function openWindow(url: string): Promise<void> {
     "[catcord] 🚀",
   );
 
-  const window = await open(url, {} as OpenOptions);
+  const window = await open(url, {
+    allowHTTP: "mixed",
+    allowNavigation: true,
+  } as OpenOptions);
 
   // Initialize the app after the window is opened
   initializeApp(window, window.page);
