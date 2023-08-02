@@ -1,15 +1,10 @@
 import { Window } from "@gluon-framework/gluon";
-import { editJsonField, log, readJsonFile } from "../util.ts";
+import { editJsonField, log } from "../util.ts";
 import { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
 import { setupThemeConfig } from "../theme.ts";
 import { GlobalSettingsTab } from "./components/generalSettingsTab.tsx";
-
-type SettingsForm = {
-  themes: string;
-};
-
-export const settings = readJsonFile<SettingsForm>("settings.json");
+import { SETTINGS_STORAGE } from "./storage.ts";
 
 // Define the type for a single settings node element
 export type SettingsNodeElement = {
@@ -37,6 +32,13 @@ export function hookSettingsToIPC(window: Window) {
   // Expose form submission for specific IDs
   {
     exposeFormSubmit<any>(window, "setThemeContents", (data) => {
+      data.themes = data
+        .themes
+        .split("\n");
+
+      console.log(data);
+
+      editJsonField("settings.json", data);
       setupThemeConfig(window, data.themes);
     });
   }
@@ -56,7 +58,7 @@ export function hookSettingsToIPC(window: Window) {
   // considering several of the setting nodes need this.
   window.ipc.store.config = {
     ...window.ipc.store.config,
-    settings: settings,
+    settings: SETTINGS_STORAGE,
   };
 
   // set the setting nodes
@@ -115,8 +117,6 @@ export function exposeFormSubmit<T>(
 ) {
   window.ipc.expose(id, (data: string) => {
     const parsed = JSON.parse(data);
-
-    editJsonField("settings.json", parsed);
 
     if (callback != undefined) {
       callback(parsed as T);

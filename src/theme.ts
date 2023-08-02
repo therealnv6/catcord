@@ -3,11 +3,11 @@ import { log, LogLevel, settings } from "./util.ts";
 import postcss, { ProcessOptions } from "postcss/lib/postcss";
 
 /**
- * Fetches the theme configuration from an external URL.
- * @returns {Promise<string>} The CSS style content.
+ * Fetches an array of theme configurations from external URLs.
+ * @returns {Promise<string>} An URL leading to the CSS target.
  */
-async function fetchTheme(url: string): Promise<string> {
-  return processCSS(url);
+async function fetchThemes(url: string): Promise<string> {
+  return await processCSS(url);
 }
 
 /**
@@ -32,7 +32,7 @@ async function processCSS(url: string): Promise<string> {
 
   // Process the CSS content with PostCSS
   const options: ProcessOptions = {
-    from: undefined,
+    from: undefined, // required to ignore warning
   };
 
   const result = await postcss(plugins).process(text, options);
@@ -48,11 +48,9 @@ async function processCSS(url: string): Promise<string> {
         node.name === "import"
       ) {
         const importTarget = node.params
-          // remove used to remove single or double quotes from a string
-          .replace(/['"]/g, "")
-          // we have to remove the `url(<url>)` around the actual url
           .replace(
-            /url\((.*?)\)/g,
+            // thanks chatgpt for this amazing regex
+            /url\(['"]?(.*?)['"]?\)|['"]/g,
             "$1",
           );
 
@@ -61,9 +59,7 @@ async function processCSS(url: string): Promise<string> {
     }),
   );
 
-  parsedCss += result.css;
-
-  return parsedCss;
+  return parsedCss += result.css;
 }
 
 let css: CSSResource | undefined;
@@ -96,38 +92,57 @@ async function applyTheme(
  */
 export async function setupThemeConfig(
   window: Window,
-  url?: string,
+  urls?: string[],
 ) {
-  if (!url && settings.themes != undefined) {
-    url = settings.themes;
+  if (!urls && settings.themes != undefined) {
+    urls = Array.isArray(
+      settings.themes,
+    )
+      ? settings.themes
+      : [settings.themes];
   }
 
-  if (!url) {
+  if (!urls || urls.length === 0) {
     return;
   }
 
-  log("Setting up theme");
+  log("Setting up themes");
 
-  try {
-    window.page.reload();
+  let styles: string[] = [];
+  window.ipc.store.config = {
+    ...window.ipc.store.config,
+    themesLoaded: [],
+  };
 
-    const style = await fetchTheme(url);
-    log("Retrieved theme");
-    await applyTheme(window, style);
-  } catch (error: any) {
-    log(
-      `Error fetching theme: ${error.message}`,
-      LogLevel.ERROR,
-    );
+  for (const url of urls) {
+    try {
+      window.page.reload();
 
-    window.ipc.store.config["themes-loaded"] = false;
-    return;
+      styles.push(
+        await fetchThemes(url),
+      );
+
+      log("Retrieved themes");
+    } catch (error: any) {
+      log(
+        `Error fetching themes: ${error.message}`,
+        LogLevel.ERROR,
+      );
+
+      window.ipc.store.config.themesLoaded[url] = error.message;
+      return;
+    }
+
+    window
+      .ipc
+      .store
+      .config.themesLoaded[url] = "true";
   }
 
-  window
-    .ipc
-    .store
-    .config["themes-loaded"] = true;
+  await applyTheme(
+    window,
+    styles.join("\n"),
+  );
 
-  log("Wrote theme to IPC");
+  log("Wrote themes to IPC");
 }
