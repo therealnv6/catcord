@@ -102,25 +102,34 @@ export function injectSettings(page: PageApi) {
           container.replaceChildren();
           container.appendChild(child);
 
-          child.innerHTML = await gluon.ipc.renderToString(id);
+          async function updateInnerHTML() {
+            child.innerHTML = await gluon.ipc.renderToString(id);
+          }
+
+          await updateInnerHTML();
 
           const buttons = child.querySelectorAll("button");
 
           for (const button of buttons) {
             const form = button.closest("form");
 
-            button.addEventListener("click", (event) => {
+            button.addEventListener("click", async (event) => {
               event.preventDefault();
 
-              if (form) {
+              if (form && !button.hasAttribute("id")) {
                 const formData = new FormData(form);
                 const serializedData = JSON.stringify(
                   Object.fromEntries(formData.entries()),
                 );
-                gluon.ipc[form.getAttribute("id")!](serializedData);
+
+                await gluon.ipc[form.getAttribute("id")!](
+                  serializedData,
+                );
               } else {
-                gluon.ipc[button.getAttribute("id")!]();
+                await gluon.ipc[button.getAttribute("id")!]();
               }
+
+              await updateInnerHTML();
             });
           }
         };

@@ -2,9 +2,9 @@ import { Window } from "@gluon-framework/gluon";
 import { editJsonField, log } from "../util.ts";
 import { ReactElement } from "react";
 import { renderToString } from "react-dom/server";
-import { setupThemeConfig } from "../theme.ts";
+import { setupThemeConfig, unloadTheme } from "../theme.ts";
 import { GlobalSettingsTab } from "./components/generalSettingsTab.tsx";
-import { SETTINGS_STORAGE } from "./storage.ts";
+import { reloadFromFile, SETTINGS_STORAGE } from "./storage.ts";
 
 // Define the type for a single settings node element
 export type SettingsNodeElement = {
@@ -31,7 +31,7 @@ export function hookSettingsToIPC(window: Window) {
 
   // Expose form submission for specific IDs
   {
-    exposeFormSubmit<any>(window, "setThemeContents", (data) => {
+    exposeTypedSubmit<any, void>(window, "setThemeContents", async (data) => {
       data.themes = data
         .themes
         .split("\n");
@@ -39,7 +39,27 @@ export function hookSettingsToIPC(window: Window) {
       console.log(data);
 
       editJsonField("settings.json", data);
-      setupThemeConfig(window, data.themes);
+      reloadFromFile();
+
+      // re-setup the theme
+      await setupThemeConfig(
+        window,
+        data.themes,
+      );
+    });
+
+    exposeSubmit<void>(window, "unloadTheme", async () => {
+      editJsonField("settings.json", {
+        themes: [""], /*actually have to set the theme to be empty*/
+      });
+
+      window
+        .ipc
+        .store
+        .config.themesLoaded = [];
+
+      reloadFromFile();
+      unloadTheme();
     });
   }
 
@@ -106,20 +126,37 @@ export function wrapToSettingNode(
 }
 
 /**
- * Exposes form submission for a given ID through IPC.
+ * Exposes a typed function for a given ID through IPC.
  * @param window The browser window object.
  * @param id The ID of the form submission to expose.
  */
-export function exposeFormSubmit<T>(
+export function exposeTypedSubmit<T, R>(
   window: Window,
   id: string,
-  callback?: (data: T) => void | undefined,
+  callback?: (data: T) => Promise<R>,
 ) {
   window.ipc.expose(id, (data: string) => {
     const parsed = JSON.parse(data);
 
-    if (callback != undefined) {
-      callback(parsed as T);
+    if (callback) {
+      return callback(parsed as T);
+    }
+  });
+}
+
+/**
+ * Exposes for a given ID through IPC.
+ * @param window The browser window object.
+ * @param id The ID of the form submission to expose.
+ */
+export function exposeSubmit<R>(
+  window: Window,
+  id: string,
+  callback?: () => Promise<R>,
+) {
+  window.ipc.expose(id, () => {
+    if (callback) {
+      return callback();
     }
   });
 }

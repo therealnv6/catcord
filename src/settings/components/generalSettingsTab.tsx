@@ -1,7 +1,7 @@
 import { Window } from "@gluon-framework/gluon";
 import TextArea from "../../components/textArea.tsx";
-import Button from "../../components/button.tsx";
 import { SETTINGS_STORAGE } from "../storage.ts";
+import { Button, ButtonContainer } from "../../components/button.tsx";
 
 // Heavily inspired by Vencord
 export function GlobalSettingsTab(window: Window) {
@@ -18,15 +18,21 @@ export function GlobalSettingsTab(window: Window) {
             name="themes"
             rows={5}
             cols={115}
-            value={currentValue.join("\n")}
+            value={currentValue.length > 0 ? currentValue.join("\n") : ""}
           />
         </div>
 
         <br />
 
-        <Button>
-          Update Theme
-        </Button>
+        <ButtonContainer>
+          <Button style={{ marginRight: "5px" }}>
+            Update Theme
+          </Button>
+
+          <Button id="unloadTheme">
+            Reset Theme
+          </Button>
+        </ButtonContainer>
       </form>
 
       <br />
@@ -47,12 +53,22 @@ export function GlobalSettingsTab(window: Window) {
               <span style={{ color: value === "true" ? "green" : "red" }}>
                 {value === "true" ? "✅" : "❌"}
               </span>{" "}
-              <strong>{url}</strong>
+              <strong>
+                {
+                  url
+                    .split("/") // split by '/' (url delimiter)
+                    .pop() // get the last element
+                }
+              </strong>
             </h1>
-            {!value && (
+            {value != "true" && (
               <div
-                className="colorStandard-1Xxp1s size14-k_3Hy4 default-h5DUM7 formText-2UzJT0 modeDefault-3Warim"
-                style={{ color: "var(--text-positive)" }}
+                className="colorStandard-1Xxp1s default-h5DUM7 formText-2UzJT0 modeDefault-3Warim"
+                style={{
+                  fontSize: "8px",
+                  textTransform: "none",
+                  width: "65%",
+                }}
               >
                 {loadResult[url]}
               </div>

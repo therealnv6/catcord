@@ -86,6 +86,16 @@ async function applyTheme(
   }
 }
 
+export async function unloadTheme() {
+  try {
+    if (css != undefined) {
+      await css.remove();
+    }
+  } finally {
+    log("Unloaded theme");
+  }
+}
+
 /**
  * Sets up the theme configuration.
  * @param {Window} window - The Window object representing the browser window.
@@ -115,9 +125,11 @@ export async function setupThemeConfig(
   };
 
   for (const url of urls) {
-    try {
-      window.page.reload();
+    if (url.length === 0) {
+      continue;
+    }
 
+    try {
       styles.push(
         await fetchThemes(url),
       );
