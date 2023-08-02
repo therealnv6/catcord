@@ -60,31 +60,38 @@ export function injectSettings(page: PageApi) {
        * @param node - The SettingsNodeElement representing the CatCord setting.
        * @param parent - The parent element to insert the new settings element after.
        */
-      const handleClick = (node: SettingsNodeElement, parent: Element) => {
-        const { text, id, html } = node;
+
+      const handleClick = async (
+        node: SettingsNodeElement,
+        parent: Element,
+      ) => {
+        const { text, id } = node;
 
         if (parent == null) {
           return;
         }
 
         // Create a new element to display CatCord settings
-        const newNode = parent.cloneNode(
-          true,
-        ) as HTMLElement;
-
+        const newNode = parent.cloneNode(true) as HTMLElement;
         newNode.textContent = text;
         newNode.id = id;
 
-        newNode.onclick = () => {
+        newNode.onclick = async () => {
           const className = "contentColumn-1C7as6";
+          const allNodes = document.querySelectorAll(".selected-1sf9UK");
 
-          // find the class of the "inner" settings element
-          const container = document.querySelector<HTMLDivElement>(
-            `.${className}`,
-          );
+          // Deselect all nodes
+          for (const node of allNodes) {
+            node.setAttribute("aria-selected", "false");
+            node.classList.remove("selected-1sf9UK");
+          }
 
-          // we will return early if the element was not found; this would be strange,
-          // because how would you be able to see the button? anyways.
+          // Select the clicked node
+          newNode.setAttribute("aria-selected", "true");
+          newNode.classList.add("selected-1sf9UK");
+
+          const container = document.querySelector(`.${className}`);
+
           if (container == null) {
             return;
           }
@@ -95,11 +102,9 @@ export function injectSettings(page: PageApi) {
           container.replaceChildren();
           container.appendChild(child);
 
-          child.innerHTML = html;
+          child.innerHTML = await gluon.ipc.renderToString(id);
 
-          const buttons = child.querySelectorAll<HTMLButtonElement>(
-            "button",
-          );
+          const buttons = child.querySelectorAll("button");
 
           for (const button of buttons) {
             const form = button.closest("form");
@@ -112,7 +117,6 @@ export function injectSettings(page: PageApi) {
                 const serializedData = JSON.stringify(
                   Object.fromEntries(formData.entries()),
                 );
-
                 gluon.ipc[form.getAttribute("id")!](serializedData);
               } else {
                 gluon.ipc[button.getAttribute("id")!]();
@@ -121,10 +125,7 @@ export function injectSettings(page: PageApi) {
           }
         };
 
-        parent.insertAdjacentElement(
-          "afterend",
-          newNode,
-        );
+        parent.insertAdjacentElement("afterend", newNode);
       };
 
       // Inject CatCord settings elements into the page

@@ -16,6 +16,7 @@ export type SettingsNodeElement = {
   text: string;
   html: string;
   id: string;
+  element: ReactElement;
 };
 
 // The initial settings data with a single element
@@ -29,12 +30,27 @@ export function hookSettingsToIPC(window: Window) {
   // Log that we are hooking the settings into the IPC
   log("Hooking settings into the IPC");
 
+  const componentTypeMap = {
+    "cat-settings": GlobalSettingsTab,
+  };
+
   // Expose form submission for specific IDs
   {
     exposeFormSubmit<any>(window, "setThemeContents", (data) => {
       setupThemeConfig(window, data.themes);
     });
   }
+
+  window
+    .ipc
+    .expose(
+      "renderToString",
+      (element: string) => {
+        return renderToString(
+          componentTypeMap[element](window),
+        );
+      },
+    );
 
   // write the settings here already,
   // considering several of the setting nodes need this.
@@ -46,7 +62,8 @@ export function hookSettingsToIPC(window: Window) {
   // set the setting nodes
   settingNodes = [
     wrapToSettingNode(
-      GlobalSettingsTab(window),
+      GlobalSettingsTab,
+      window,
       "cat-settings",
       "Catcord Settings",
     ),
@@ -71,7 +88,8 @@ export function hookSettingsToIPC(window: Window) {
  * @returns The setting node object.
  */
 export function wrapToSettingNode(
-  element: ReactElement,
+  element: (window: Window) => ReactElement,
+  window: Window,
   id: string,
   display: string,
 ): SettingsNodeElement {
@@ -79,8 +97,9 @@ export function wrapToSettingNode(
     text: display,
     id: id,
     html: renderToString(
-      element,
+      element(window),
     ),
+    element: element(window),
   };
 }
 
@@ -95,11 +114,12 @@ export function exposeFormSubmit<T>(
   callback?: (data: T) => void | undefined,
 ) {
   window.ipc.expose(id, (data: string) => {
-    console.log(data);
-    editJsonField("settings.json", JSON.parse(data));
+    const parsed = JSON.parse(data);
+
+    editJsonField("settings.json", parsed);
 
     if (callback != undefined) {
-      callback(JSON.parse(data) as T);
+      callback(parsed as T);
     }
   });
 }

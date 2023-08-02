@@ -73,7 +73,10 @@ let css: CSSResource | undefined;
  * @param {Window} window - The Window object representing the browser window.
  * @param {string} style - The CSS style content.
  */
-async function applyTheme(window: Window, style: string) {
+async function applyTheme(
+  window: Window,
+  style: string,
+) {
   try {
     const updated = await window.resources.css(style);
 
@@ -106,6 +109,8 @@ export async function setupThemeConfig(
   log("Setting up theme");
 
   try {
+    window.page.reload();
+
     const style = await fetchTheme(url);
     log("Retrieved theme");
     await applyTheme(window, style);
@@ -114,7 +119,15 @@ export async function setupThemeConfig(
       `Error fetching theme: ${error.message}`,
       LogLevel.ERROR,
     );
+
+    window.ipc.store.config["themes-loaded"] = false;
+    return;
   }
+
+  window
+    .ipc
+    .store
+    .config["themes-loaded"] = true;
 
   log("Wrote theme to IPC");
 }

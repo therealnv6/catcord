@@ -8,6 +8,7 @@ type TextAreaProps = React.DetailedHTMLProps<
 const containerClassName = "container-3i3IzO";
 const textAreaStyle: React.CSSProperties = {
   color: "white",
+  border: "false",
 };
 
 const TextArea: React.FC<TextAreaProps> = (props) => {

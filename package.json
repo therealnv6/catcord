@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "type": "module",
   "description": "a discord client utilizing gluon",
-  "main": "src/index.ts",
+  "main": "src/app.ts",
   "scripts": {
     "watch": [
       "src"
     ],
     "ext": ".ts,.js",
     "ignore": [],
-    "start": "npx ts-node --esm ./src/index.ts",
+    "start": "npx ts-node --esm ./src/app.ts",
     "start:dev": "npx nodemon"
   },
   "keywords": [],
@@ -18,13 +18,16 @@
   "license": "ISC",
   "dependencies": {
     "@gluon-framework/gluon": "^0.14.0",
+    "import-jsx": "^5.0.0",
     "node-fetch": "2.6.7",
     "nodemon": "^2.0.22",
     "postcss": "^8.4.27",
     "postcss-import": "^15.1.0",
     "postcss-parser-tests": "^8.6.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-jsx": "^1.0.0",
+    "react-scripts": "^5.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.4.0",
