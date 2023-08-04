@@ -41,7 +41,10 @@ async function openWindow(url: string): Promise<void> {
     {
       allowHTTP: "mixed",
       allowNavigation: true,
-      localCSP: "font-src 'self' *;",
+      localCSP: `
+        font-src 'self' *; 
+        img-src 'self' *;
+      `,
     } as OpenOptions,
   );
 

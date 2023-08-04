@@ -8,7 +8,10 @@ type TextAreaProps = React.DetailedHTMLProps<
 const containerClassName = "container-3i3IzO";
 const textAreaStyle: React.CSSProperties = {
   color: "white",
-  border: "false",
+  cursor: "text",
+  overflow: "hidden",
+  border: "none",
+  outline: "none",
 };
 
 const TextArea: React.FC<TextAreaProps> = (props) => {

@@ -36,8 +36,6 @@ export function hookSettingsToIPC(window: Window) {
         .themes
         .split("\n");
 
-      console.log(data);
-
       editJsonField("settings.json", data);
       reloadFromFile();
 

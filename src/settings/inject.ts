@@ -39,7 +39,10 @@ export function injectSettings(page: PageApi) {
       // Find the "advanced" settings element (assumed to be related to social links)
       let parent = document
         .querySelector('[class*="socialLinks-"]')!
-        .parentElement!.querySelector('[class*="item"]'.repeat(10));
+        .parentElement!
+        .querySelector(
+          '[class*="item"]'.repeat(10),
+        );
 
       // If the "advanced" settings element is not found, exit the function
       if (!parent) {
