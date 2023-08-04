@@ -3,6 +3,7 @@ import TextArea from "../../components/textArea.tsx";
 import { SETTINGS_STORAGE } from "../storage.ts";
 import { Button, ButtonContainer } from "../../components/button.tsx";
 import { CardComponent } from "../../components/card.tsx";
+import Heading from "../../components/text.tsx";
 
 // Heavily inspired by Vencord
 export function GlobalSettingsTab(window: Window) {
@@ -13,6 +14,10 @@ export function GlobalSettingsTab(window: Window) {
 
   return (
     <>
+      <Heading variant="h2">Theme Selection</Heading>
+      <br />
+      <Heading variant="h3">Theme Input</Heading>
+
       <form id="setThemeContents">
         <div>
           <TextArea
@@ -38,8 +43,8 @@ export function GlobalSettingsTab(window: Window) {
 
       <br />
       <br />
-      <br />
 
+      <Heading variant="h3">Themes</Heading>
       {Object.entries(loadResult).map(([url, value]) => (
         <CardComponent
           key={url}

@@ -64,7 +64,7 @@ export const CardComponent: React.FC<CardProps> = ({ display, value }) => {
       <h1 style={{ overflowWrap: "break-word", width: "65%" }}>
         <ValueIndicator
           value={value}
-        />
+        />{" "}
         <strong>{display}</strong>
       </h1>
       {value !== "true" && (

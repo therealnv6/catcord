@@ -11,7 +11,7 @@
     "ext": ".ts,.js",
     "ignore": [],
     "start": "npx ts-node --esm ./src/app.ts",
-    "start:dev": "npx nodemon"
+    "start:dev": "npx nodemon -x ts-node --esm ./src/app.ts"
   },
   "keywords": [],
   "author": "",
